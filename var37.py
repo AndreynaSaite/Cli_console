@@ -117,8 +117,11 @@ class ShellEmulator:
         if command.startswith("cd "):# 1
             self.cd(command[3:])
             self.hist.append(command)
-        elif command == "ls": # 1
-            self.ls()
+        elif command.startswith("ls"): # 1
+            if len(command) == 2:
+                self.ls()
+            else:
+                self.ls_args(command[3:])
             self.hist.append(command)
         elif command == "exit": # 1
             self.exit_shell()
@@ -183,9 +186,9 @@ class ShellEmulator:
         #load average: 0.03, 0.10, 0.10 — load average: 0.03, 0.10, 0.10 системы за последние 1, 5 и 15 минут.
 '''
     def cd(self, path):
-        #print(self.vfs)
+        #print(self.vfs)    
         if path == "..":
-            if self.current_path != '':
+            if self.current_path != '/':
                 # os.path.dirname - возвращает имя директории по указанному пути
                 self.current_path = os.path.dirname(self.current_path.rstrip('/'))
                 print(f"Перешли на уровень выше: '{self.current_path}'")
@@ -197,9 +200,31 @@ class ShellEmulator:
             )
             if path_prefix in self.vfs and self.current_path + path + "/" in self.vfs:
                 self.current_path = self.current_path + path + "/"
-                print(self.current_path)
             else:
                 print(f"No such directory: {path}")
+
+    def cd_l(self):
+        if self.current_path != '/':
+                # os.path.dirname - возвращает имя директории по указанному пути
+                self.current_path = os.path.dirname(self.current_path.rstrip('/'))
+    def ls_args(self,path):
+        contents = set()
+        self.cd(path)
+        path_prefix = (
+            self.current_path
+            if self.current_path.endswith("/")
+            else self.current_path + "/"
+        )
+        for file in self.vfs:
+            if file.startswith(path_prefix):
+                sub_path = file[len(path_prefix) :].split("/")[
+                    0
+                ]  # Get the first directory level
+                contents.add(sub_path)
+
+        # Print unique entries (files/directories)
+        self.cd_l()
+        print("\n".join(sorted(contents)))
 
     def ls(self):
         contents = set()

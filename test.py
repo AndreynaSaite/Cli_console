@@ -101,7 +101,7 @@ def test_cd(shell_emulator,capsys):
     shell_emulator.execute("cd 3")
     shell_emulator.execute("cd ..")
     captured = capsys.readouterr()
-    assert "/3/" + '\n'+f"Перешли на уровень выше: '/'"+ '\n' == captured.out
+    assert f"Перешли на уровень выше: '/'"+ '\n' == captured.out
     
   
 def test_date(shell_emulator,capsys):
